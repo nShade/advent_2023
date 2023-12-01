@@ -45,26 +45,16 @@ function findFirstAndLastDigit2(s){
         eight: "8",
         nine: "9",
         zero: "0"
-    }
-
-    let last_five = ["", "", "", "", ""];
+    };
 
     [" "].concat(s.split('')).reduce((total, value, index, array) => {
-        last_five = array.slice(index > 3 ? index - 4 : 0, index + 1);        
+        let last_five = array.slice(index > 3 ? index - 4 : 0, index + 1);        
 
-        let last_five_letters = last_five.join("");
-        let last_four_letters = last_five.slice(1).join("");
-        let last_three_letters = last_five.slice(2).join("");
+        value = numbers[last_five.join("")] ?? 
+                numbers[last_five.slice(1).join("")] ?? 
+                numbers[last_five.slice(2).join("")] ?? 
+                value;
 
-        if (last_five_letters in numbers){
-            value = numbers[last_five_letters];
-        }
-        else if (last_four_letters in numbers){
-            value = numbers[last_four_letters];
-        }        
-        else if (last_three_letters in numbers){
-            value = numbers[last_three_letters];
-        }
 
         if (isDigit(value)) {
             first_digit = first_digit ?? value;
