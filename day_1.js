@@ -22,7 +22,7 @@ function sum(a, b) {
 function findFirstAndLastDigit(s){
     let first_digit;
     let last_digit;
-    [" "].concat(s.split('')).reduce((total, value) => {
+    s.split('').forEach((value) => {
         if (isDigit(value)) {
             first_digit = first_digit ?? value;
             last_digit = value;
@@ -41,7 +41,7 @@ function findFirstAndLastDigit2(s){
     let last_digit;
     let matches = number_names.map(x => 0);
 
-    [" "].concat(s.split('')).reduce((_, char) => {
+    s.split('').forEach((char) => {
         matches = matches.map((match, index) => {
             return (char == number_letters[index][match]) ? match + 1 : (char == number_letters[index][0]) ? 1 : 0
         });
