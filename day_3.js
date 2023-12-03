@@ -63,7 +63,7 @@ function sum_gear_ratios(chars){
         line.forEach((char, char_index) => {
             if (char == '*'){
                 let adjacent_numbers = get_adjacent_numbers(line_index, char_index, chars);
-                console.log(line_index, char_index, adjacent_numbers);
+
                 if (adjacent_numbers.length == 2){
                     res += adjacent_numbers[0] * adjacent_numbers[1];
                 }
@@ -82,7 +82,6 @@ function get_adjacent_numbers(line_index, char_index, chars){
             if (visited[li * 140 + ci]){
                 break;
             }
-            visited[li * 140 + ci] = true;
             let number = get_number(li, ci, chars, visited);
             if (number){
                 numbers.push(number);
