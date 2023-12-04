@@ -15,26 +15,24 @@ fs.readFile('input_day_4.txt', 'utf-8', (err, data) => {
                                                    .map(Number)});
                     });
 
-    let res = sum_winning(cards);
+    let cards_wins = cards.map(([on_card, winning]) => on_card.filter(n => winning.includes(n)).length)
+
+    let res = sum_winning(cards_wins);
     console.log(res);
 
-    let res2 = count_cards(cards);
+    let res2 = count_cards(cards_wins);
     console.log(res2);
 })
 
-function sum_winning(cards){
-    return cards.map(([on_card, winning]) => {
-        let have_winning = on_card.filter(n => winning.includes(n)).length;
-        return have_winning == 0 ? 0 : 2 ** (have_winning - 1);
-    }).reduce(sum, 0);
+function sum_winning(cards_wins){
+    return cards_wins.reduce((score, wins) => score += wins == 0 ? 0 : 2 ** (wins - 1), 0)
 }
 
-function count_cards(cards){
-    let cards_count = cards.map(x => 1);
+function count_cards(cards_wins){
+    let cards_count = cards_wins.map(x => 1);
 
-    cards.forEach(([on_card, winning], index) => {
-        let have_winning = on_card.filter(n => winning.includes(n)).length;
-        for (let i = index + 1; (i < index + have_winning + 1) && (i < cards_count.length); i++){
+    cards_wins.forEach((wins, index) => {
+        for (let i = index + 1; (i < index + wins + 1) && (i < cards_count.length); i++){
             cards_count[i] += cards_count[index];
         }        
     });
