@@ -7,7 +7,6 @@ fs.readFile('input_day_6.txt', 'utf-8', (err, data) => {
     };
 
     let [times, distances] = data.split('\r\n').map(x=> x.split(':')[1].split(' ').filter(x=> x!='').map(Number));
-    console.log(times, '/', distances);
 
     let res = 1;
 
@@ -17,7 +16,12 @@ fs.readFile('input_day_6.txt', 'utf-8', (err, data) => {
 
     console.log(res);
 
-    let res2;
+
+    let [time, distance] = data.split('\r\n').map(x=> x.split(':')[1].replaceAll(' ', '')).map(Number);
+
+    console.log(time, distance);
+
+    let res2 = waysToWin(time, distance);
     console.log(res2);
 });
 
