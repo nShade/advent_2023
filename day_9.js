@@ -11,7 +11,7 @@ fs.readFile('input_day_9.txt', 'utf-8', (err, data) => {
     let res = sequences.map(continueSequence).reduce((a, b) => a + b);
     console.log(res);
 
-    let res2;
+    let res2 = sequences.map(continueSequenceLeft).reduce((a, b) => a + b);
     console.log(res2);
 });
 
@@ -21,6 +21,25 @@ function continueSequence(sequence){
 
     while (!sequence.every(entry => entry == 0)){
         res += sequence[sequence.length - 1];
+
+        let new_sequence = [];
+        sequence.reduce((prev, current) => {
+            new_sequence.push(current - prev);
+            return current;
+        });
+        sequence = new_sequence;
+    }
+
+    return res;
+}
+
+function continueSequenceLeft(sequence){
+    let res = 0;
+    let add = true;
+
+    while (!sequence.every(entry => entry == 0)){
+        res = add ? res + sequence[0] : res - sequence[0];
+        add = !add;
 
         let new_sequence = [];
         sequence.reduce((prev, current) => {
