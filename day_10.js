@@ -10,23 +10,36 @@ fs.readFile('input_day_10.txt', 'utf-8', (err, data) => {
     let width = pipe_list[0].length;
     let pipes = pipe_list.join('').split('');
     let is_loop = pipes.map(p => false);
-    let initial_position = pipe_map.indexOf('S');
+    let initial_position = pipes.indexOf('S');
 
-    const moves = {
-        "L": - width + 1,
-        "|": 0,
-        "-": 0,
-        "F": width + 1,
-        "J": - width - 1,
-        "7": width - 1,
-    }
+    const connections = {
+        "L": [-width, 1, 0, 0],
+        "|": [-width, 0, width, 0],
+        "-": [0, 1, 0, -1],
+        "F": [0, 1, width, 0],
+        "J": [-width, 0, 0, -1],
+        "7": [0, 0, width, -1],
+        ".": [0, 0, 0, 0]
+    } 
 
-    // too lazy to put code that converts start position into a proper pipe
-    pipes[initial_position] = "L";
-    let [a_shift, a_pos, b_shift, b_pos] = [1, initial_position + 1, -width, initial_position - width];
+    let moves = {};
+    Object.entries(connections).forEach(([k, v]) => moves[k] = v.reduce((a, b) => a + b));
+    
+    let pipe_dict = new Map();
+    Object.entries(connections).forEach(([k, v]) => pipe_dict.set(v.toString(), k));
+
+    let up = - connections[pipes[initial_position - width]][2];
+    let right = - connections[pipes[initial_position + 1]][3];
+    let down = - connections[pipes[initial_position + width]][0];
+    let left = - connections[pipes[initial_position - 1]][1];
+
+    pipes[initial_position] = pipe_dict.get([up, right, down, left].toString());
+    let [a_shift, b_shift] = [up, right, down, left].filter(x => x != 0);
+    let [a_pos, b_pos] = [initial_position + a_shift, initial_position + b_shift];
+  
     is_loop[initial_position] = true;
-    is_loop[initial_position + 1] = true;
-    is_loop[initial_position - width] = true;
+    is_loop[a_pos] = true;
+    is_loop[b_pos] = true;
     let distance = 1;
 
     while (a_pos != b_pos) {
