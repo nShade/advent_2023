@@ -20,34 +20,40 @@ fs.readFile('input_day_10.txt', 'utf-8', (err, data) => {
         "J": [-width, 0, 0, -1],
         "7": [0, 0, width, -1],
         ".": [0, 0, 0, 0]
-    } 
+    }
 
     let moves = {};
     Object.entries(connections).forEach(([k, v]) => moves[k] = v.reduce((a, b) => a + b));
-    
+
     let pipe_dict = new Map();
     Object.entries(connections).forEach(([k, v]) => pipe_dict.set(v.toString(), k));
 
-    let up = - connections[pipes[initial_position - width]][2];
-    let right = - connections[pipes[initial_position + 1]][3];
-    let down = - connections[pipes[initial_position + width]][0];
-    let left = - connections[pipes[initial_position - 1]][1];
+    let initial_pos_connections =
+        [- connections[pipes[initial_position - width]][2],
+        - connections[pipes[initial_position + 1]][3],
+        - connections[pipes[initial_position + width]][0],
+        - connections[pipes[initial_position - 1]][1]];
 
-    pipes[initial_position] = pipe_dict.get([up, right, down, left].toString());
-    let [a_shift, b_shift] = [up, right, down, left].filter(x => x != 0);
-    let [a_pos, b_pos] = [initial_position + a_shift, initial_position + b_shift];
-  
+    pipes[initial_position] = pipe_dict.get(initial_pos_connections.toString());
+
+    let [a_shift, b_shift] = initial_pos_connections.filter(x => x != 0);
+    let [a_pos, b_pos] = [initial_position, initial_position];
+
     is_loop[initial_position] = true;
-    is_loop[a_pos] = true;
-    is_loop[b_pos] = true;
-    let distance = 1;
+    let distance = 0;
 
-    while (a_pos != b_pos) {
-        [a_shift, a_pos] = makeStep(a_shift, a_pos, pipes, moves);
-        [b_shift, b_pos] = makeStep(b_shift, b_pos, pipes, moves);
+    while (true) {
+        a_pos += a_shift;
+        b_pos += b_shift;
+        a_shift += moves[pipes[a_pos]];
+        b_shift += moves[pipes[b_pos]];
         is_loop[a_pos] = true;
         is_loop[b_pos] = true;
         distance += 1;
+
+        if (a_pos == b_pos) {
+            break;
+        }
     }
 
     let res = distance;
@@ -67,15 +73,10 @@ fs.readFile('input_day_10.txt', 'utf-8', (err, data) => {
             inside = !inside;
         } else if ('LF'.includes(pipe)) {
             prev_pipe = pipe;
-        } else if (pipe == "7" && prev_pipe == "L") {
-            prev_pipe = "";
-            inside = !inside;
-        } else if (pipe == "J" && prev_pipe == "F") {
-            prev_pipe = "";
-            inside = !inside;
-        } else if (pipe == "7" && prev_pipe == "F") {
-            prev_pipe = "";
-        } else if (pipe == "J" && prev_pipe == "L") {
+        } else if ('7J'.includes(pipe)) {
+            if (moves[prev_pipe] + moves[pipe] == 0){
+                inside = !inside;
+            } 
             prev_pipe = "";
         }
     });
@@ -83,8 +84,3 @@ fs.readFile('input_day_10.txt', 'utf-8', (err, data) => {
     let res2 = enclosed;
     console.log(res2);
 });
-
-function makeStep(shift, pos, pipe_map, moves) {
-    shift += moves[pipe_map[pos]];
-    return [shift, pos + shift];
-};
