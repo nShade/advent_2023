@@ -35,28 +35,19 @@ fs.readFile('input_day_10.txt', 'utf-8', (err, data) => {
         - connections[pipes[initial_position - 1]][1]];
 
     pipes[initial_position] = pipe_dict.get(initial_pos_connections.toString());
+    let shift = initial_pos_connections.filter(x => x != 0)[0];
+    let pos = initial_position + shift;
+    is_loop[pos] = true;
+    let distance = 1;
 
-    let [a_shift, b_shift] = initial_pos_connections.filter(x => x != 0);
-    let [a_pos, b_pos] = [initial_position, initial_position];
-
-    is_loop[initial_position] = true;
-    let distance = 0;
-
-    while (true) {
-        a_pos += a_shift;
-        b_pos += b_shift;
-        a_shift += moves[pipes[a_pos]];
-        b_shift += moves[pipes[b_pos]];
-        is_loop[a_pos] = true;
-        is_loop[b_pos] = true;
+    while (pos != initial_position) {
+        shift += moves[pipes[pos]];
+        pos += shift;
+        is_loop[pos] = true;
         distance += 1;
-
-        if (a_pos == b_pos) {
-            break;
-        }
     }
 
-    let res = distance;
+    let res = distance / 2;
     console.log(res);
 
     let enclosed = 0;
