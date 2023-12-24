@@ -8,31 +8,30 @@ fs.readFile('input_day_11.txt', 'utf-8', (err, data) => {
     };
 
     let space = data.split('\r\n').map(x => x.split(''));
-    space = transpose(expand(transpose(expand(space))));
-    let galaxies = findGalaxies(space);
-    // let empty_rows = findEmptyRows(space);
-    // let empty_cols = findEmptyColumns(space);
-    let distances = 0;
-    // console.log(galaxies);
-    // console.log(empty_rows);
-    // console.log(empty_cols);
-    // console.log(findEmptyRows(transpose(space)));
 
-    // galaxies.forEach((start_galaxy, index) => {
-    //     galaxies.slice(index + 1).forEach((finish_galaxy) => {
-    //         distances += distance(start_galaxy, finish_galaxy, empty_cols, empty_rows, 1);
-    //     })
-    // });
+    let galaxies = findGalaxies(space);
+    let empty_rows = findEmptyRows(space);
+    let empty_cols = findEmptyColumns(space);
+    let distances = 0;
+
     galaxies.forEach((start_galaxy, index) => {
         galaxies.slice(index + 1).forEach((finish_galaxy) => {
-            distances += distance(start_galaxy, finish_galaxy, [], [], 1);
+            distances += distance(start_galaxy, finish_galaxy, empty_cols, empty_rows, 1);
         })
-    });    
+    });  
 
     let res = distances;
     console.log(res);
 
-    let res2;
+    distances = 0;
+
+    galaxies.forEach((start_galaxy, index) => {
+        galaxies.slice(index + 1).forEach((finish_galaxy) => {
+            distances += distance(start_galaxy, finish_galaxy, empty_cols, empty_rows, 1000000 - 1);
+        })
+    });      
+
+    let res2 = distances;
     console.log(res2);
 });
 
@@ -78,26 +77,10 @@ function distance(galaxy_a, galaxy_b, empty_cols, empty_rows, expantion) {
 
 function empty_spaces(a, b, spaces) {
     let res = 0;
-    [a, b] = [a, b].sort();
-
+    [a, b] = [a, b].sort((a, b) => a - b);
     spaces.forEach(space => {
         if (space > a && space < b) {
             res += 1;
-        }
-    })
-    return res;
-}
-
-function transpose(matrix) {
-    return matrix[0].map((col, i) => matrix.map(row => row[i]));
-}
-
-function expand(space){
-    let res = [];
-    space.forEach(line => {
-        res.push(line);
-        if (line.every(el => el == '.')){
-            res.push(line);
         }
     })
     return res;
