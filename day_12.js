@@ -12,7 +12,7 @@ fs.readFile('input_day_12.txt', 'utf-8', (err, data) => {
         return [spring_map, damaged_groups.split(',').map(Number)];
     });
 
-    let res = springs_data.map(spring_data => possibleArrangements(...spring_data)).reduce((a, b) => a + b);
+    let res = sum(springs_data.map(spring_data => possibleArrangements(...spring_data)));
     console.log(res);
 
     let unfolded_springs_data = springs_data.map(([spring_map, damaged_groups]) => {
@@ -24,48 +24,54 @@ fs.readFile('input_day_12.txt', 'utf-8', (err, data) => {
         }
         return [resulting_spring_map, resulting_damaged_groups];
     });
-    let startTime = performance.now();
-    let res2 = 0;
-    unfolded_springs_data.forEach((spring_data, index) => {
-        res2 += possibleArrangements(...spring_data);
-        console.log(index);
-    });
-    let endTime = performance.now();
-    console.log(endTime - startTime);
+    let res2 = sum(unfolded_springs_data.map(spring_data => possibleArrangements(...spring_data)));
     console.log(res2);
 });
 
 function possibleArrangements(springs_map, groups) {
-    let arrangements = 0;
-    let [group, ...remaining] = groups;
-    let max_pos = springs_map.length - sum(groups) - groups.length + 1;
+    let cache = [];
 
-    for (let pos = 0; pos <= max_pos; pos++) {
-        if (!operational(springs_map, 0, pos) ||
-            !damaged(springs_map, pos, pos + group)) {
-            continue;
-        }
-
-        if (remaining.length > 0) {
-            if (!operational(springs_map, pos + group, pos + group + 1)){
-                continue;
-            };
-
-            arrangements += possibleArrangements(springs_map.slice(pos + group + 1), remaining);
-        } else {
-            if (operational(springs_map, pos + group, springs_map.length)){
-                arrangements += 1;
-            };
+    for (let i = 0; i < groups.length + 1; i++) {
+        cache.push([]);
+        for (let j = 0; j < springs_map.length; j++) {
+            cache[i].push(undefined);
         }
     }
-    return arrangements;
 
+    function pa(group_index, start) {
+        let cached = cache[group_index][start];
+        if (cached != undefined) {
+            return cached;
+        }
+
+        let res = 0;
+
+        if (group_index >= groups.length) {
+            res = operational(springs_map, start, springs_map.length) ? 1 : 0;
+        } else {
+            let max_pos = springs_map.length - sum(groups.slice(group_index)) - groups.length + group_index + 1;
+            let pos = start;
+            let endpos = pos + groups[group_index];
+
+            while (pos <= max_pos && springs_map[pos - 1] != '#') {
+                if (damaged(springs_map, pos, endpos) && springs_map[endpos] != '#') {
+                    res += pa(group_index + 1, endpos + 1);
+                };
+
+                pos++; endpos++;
+            }
+        }
+
+        cache[group_index][start] = res;
+        return res;
+    }
+
+    return pa(0, 0);
 };
 
 let operational = (spring_map, start, end) => {
     for (let i = start; i < end; i++) {
-        let spring = spring_map[i];
-        if (spring != '.' && spring != '?') {
+        if (spring_map[i] == '#') {
             return false;
         }
     }
@@ -73,22 +79,11 @@ let operational = (spring_map, start, end) => {
 }
 let damaged = (spring_map, start, end) => {
     for (let i = start; i < end; i++) {
-        let spring = spring_map[i];
-        if (spring != '#' && spring != '?') {
+        if (spring_map[i] == '.') {
             return false;
         }
     }
     return true;
-}
-
-String.prototype.count = function (char) {
-    let result = 0;
-    for (let i = 0; i < this.length; i++){
-        if (this[i] == char) {
-            result++
-        };
-    }
-    return result;
 }
 
 let sum = function (arr) {
